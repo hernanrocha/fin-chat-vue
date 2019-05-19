@@ -1,37 +1,50 @@
 <template>
   <div class="room-list">
    <div class="row">
-     <div class="col-md-6">
+     <div class="col-md-3">
    
-      <h1>Salas de Chat</h1>
-      <section class="main" v-cloak>
-        <ul>
-          <li v-for="room, index in rooms" class="room" :key="room.id" @click="selectRoom(index)">
+      <h2 class="text-primary text-center">Chat Rooms</h2>
+      <section class="rooms" v-cloak>
+        <ul class="list-group">
+          <li v-for="room, index in rooms" class="list-group-item" v-bind:class="{ active: room.id == selectedRoom.id }" :key="room.id" @click="selectRoom(index)">
             {{ room.name }}
           </li>
         </ul>
       </section>
-        <input class="new-room"
+        <input class="form-control"
           autocomplete="off"
-          placeholder="Nombre de la sala"
+          placeholder="Enter new room name..."
           v-model="newRoom">
-          <div class="btn btn-primary" @click="addRoom">Crear Sala</div>
+          <div class="btn btn-primary" @click="addRoom">Create New Room</div>
      </div>
-     <div class="col-md-6">
-       <h2>Mensajes en {{ selectedRoom.name }}</h2>
-       
-        <ul>
-          <li v-for="message in messages" class="message" :key="message.id">
-            Usuario {{ message.user_id }} dijo: {{ message.text }}
-          </li>
-        </ul>
+     
+      <div class="col-md-9 text-left chat">
+        <h2 class="text-primary text-center">Messages in {{ selectedRoom.name }}</h2>
+        <div class="card">
+            <div class="card-body">
+                <p class="nomessages text-secondary" v-if="messages.length == 0">
+                    [No messages yet!]
+                </p>
+                <div class="messages" v-chat-scroll="{always: false, smooth: true}">
+                    <div v-for="message in messages" :key="message.id">
+                        <span class="text-info">[{{ message.username }}]: </span>
+                        <span>{{message.text}}</span>
+                        <span class="text-secondary time">{{message.created_at | timestamp }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-action">
+              <!-- <CreateMessage :name="name"/> -->
+              <input type="text" name="message" 
+                class="form-control"
+                autocomplete="off"
+                placeholder="Enter message ..."
+                v-model="newMessage"
+                @keyup.enter="addMessage">
+            </div>
+        </div>
+    </div>
 
-        <input class="new-message"
-          autocomplete="off"
-          placeholder="Escribe un mensaje"
-          v-model="newMessage">
-          <div class="btn btn-primary" @click="addMessage">Send</div>
-     </div>
    </div>
   </div>
 </template>
@@ -43,59 +56,91 @@ export default {
       rooms: [],
       newRoom: "",
       selectedRoom: {
-        id: 1,
-        name: "Mesa por default",
+        id: 0,
+        name: "",
       },
       messages: [],
       newMessage: "",
+      ws: null,
     }
   },
   methods: {
     addRoom() {
-      console.log("Adding room" + this.newRoom)
+      if (!this.newRoom) {
+        console.log("Room name is empty")
+        return
+      }
+
       var room = { name: this.newRoom }
       this.newRoom = ""
 
-      this.$http.post('http://localhost:8001/api/v1/rooms', room)
+      this.$http.post('/api/v1/rooms', room)
         .then(response => {
           this.rooms.push(response.data)
-        }).finally(() => {
+        }).catch(error => {
+          this.backToHome()
         })
     },
     selectRoom(index) {
       this.selectedRoom = this.rooms[index]
-      this.$http.get("http://localhost:8001/api/v1/rooms/" + this.selectedRoom.id + "/messages")
+      this.$http.get("/api/v1/rooms/" + this.selectedRoom.id + "/messages")
         .then(response => {
-          console.log(response.data)
           this.messages = response.data.messages
+        }).catch(error => {
+          this.backToHome()
         })
     },
     addMessage() {
-      console.log("Adding message" + this.newMessage)
       var message = { 
         text: this.newMessage,
-        user_id: 1,
-        room_id: this.selectedRoom.id,
       }
       this.newMessage = ""
 
-      this.$http.post('http://localhost:8001/api/v1/messages', message)
+      this.$http.post('/api/v1/rooms/' + this.selectedRoom.id + '/messages', message)
         .then(response => {
-          this.messages.push(response.data)
-        }).finally(() => {
+        }).catch(error => {
+          this.backToHome()
         })
+    },
+    backToHome() {
+      this.$router.push({ name: 'home' })
     }
   },
   mounted () {
-    this.$http.get('http://localhost:8001/api/v1/rooms')
+    this.$http.get('/api/v1/rooms')
       .then(response => {
         this.rooms = response.data.rooms
         this.selectRoom(0)
-      })
+      }).catch(error => (this.backToHome()))
+
+    // this.ws = new WebSocket('ws://' + window.location.host + '/ws');
+    this.ws = new WebSocket("ws://localhost:8001/ws");
+    this.ws.addEventListener('message', e => {
+        let m = JSON.parse(e.data)
+        console.log(m);
+        if (m.room_id == this.selectedRoom.id) {
+          this.messages.push(m)
+        }
+    });
   }
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.rooms{
+    max-height: 300px;
+    overflow: auto;
+}
+
+.chat .time{
+    display: block;
+    font-size: 0.7em;
+}
+
+.messages{
+    min-height: 300px;
+    max-height: 300px;
+    overflow: auto;
+}
 </style>
