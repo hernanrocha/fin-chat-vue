@@ -39,7 +39,7 @@ export default {
       }
 
       var req = { username: this.username, password: this.password }
-      this.$http.post("http://localhost:8001/login", req)
+      this.$http.post("/login", req)
         .then(response => {
           console.log(response.data.token)
           console.log(this.$http.defaults)
@@ -47,6 +47,7 @@ export default {
           this.$router.push({ name: 'chat' })
         })
         .catch(err => {
+          this.errorText = "Invalid credentials"
           console.log(err)
         })
     }

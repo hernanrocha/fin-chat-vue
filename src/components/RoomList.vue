@@ -84,8 +84,9 @@ export default {
     selectRoom(index) {
       this.selectedRoom = this.rooms[index]
       this.$http.get("/api/v1/rooms/" + this.selectedRoom.id + "/messages")
-        .then(response => {
-          this.messages = response.data.messages
+        .then(response => 
+        {
+          this.messages = response.data.messages.reverse()
         }).catch(error => {
           this.backToHome()
         })
@@ -103,6 +104,7 @@ export default {
         })
     },
     backToHome() {
+      console.log("Back to home...")
       this.$router.push({ name: 'home' })
     }
   },
