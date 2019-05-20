@@ -116,7 +116,7 @@ export default {
       }).catch(error => (this.backToHome()))
 
     // this.ws = new WebSocket('ws://' + window.location.host + '/ws');
-    this.ws = new WebSocket("ws://localhost:8001/ws");
+    this.ws = new WebSocket("ws://157.230.178.85:8001/ws");
     this.ws.addEventListener('message', e => {
         let m = JSON.parse(e.data)
         console.log(m);
