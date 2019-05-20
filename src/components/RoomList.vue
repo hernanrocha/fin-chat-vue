@@ -112,7 +112,10 @@ export default {
     this.$http.get('/api/v1/rooms')
       .then(response => {
         this.rooms = response.data.rooms
-        this.selectRoom(0)
+        
+        if (this.rooms.length > 0) {
+          this.selectRoom(0)
+        }
       }).catch(error => (this.backToHome()))
 
     // this.ws = new WebSocket('ws://' + window.location.host + '/ws');
