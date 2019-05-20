@@ -1,29 +1,30 @@
-# frontend
+# FinChat Vue 
 
-## Project setup
-```
-npm install
-```
+This is the frontend for FinChat, a bot based chat.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+It's a VueJS project with the following plugins configured:
+- Vue Router
+- Babel
+- Prettier
+- PWA
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## Run with Docker
 
-### Run your tests
 ```
-npm run test
+docker-compose up
 ```
 
-### Lints and fixes files
-```
-npm run lint
-```
+## How to Use it
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Once you run the container, you could open http://localhost:8080 in your browser.
+
+Before enter the chat, you have to create and account and then login with the generated credentials.
+In the chat page, you select a room from the left list or create your own room.
+
+In order to send a message to the bot, your message should start with _/stock=_.
+This is an example chat:
+
+```
+Hernan: /stock=FB
+Bot: FB quote is $184.84 per share
+```
