@@ -53,10 +53,7 @@ jobs:
           overwrite: true
 workflows:
   version: 2
-  test_pipeline:
-    jobs:
-      - build_and_test
-  test_deploy_pipeline:
+  ultimate_pipeline:
     jobs:
       - build_and_test
       - deploy:
