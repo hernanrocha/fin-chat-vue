@@ -1,6 +1,8 @@
-version: 2
+version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@1.0.11
 jobs:
-  test:
+  build_and_test:
     docker:
       - image: circleci/node:10
     working_directory: ~/repo
@@ -20,8 +22,43 @@ jobs:
       - run:
           name: Run tests
           command: npm test
+      - store_test_results:
+          path: test-results
+  deploy:
+    docker:
+      - image: circleci/node:10
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run:
+          name: Build
+          command: npm run build
+      - aws-s3/sync:
+          from: 'dist'
+          to: 's3://finchat-vue'
+          arguments: |
+            --acl public-read \
+            --cache-control "max-age=86400"
+          overwrite: true
 workflows:
   version: 2
   ultimate_pipeline:
     jobs:
-      - test
+      - build_and_test
+      - deploy:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: master
