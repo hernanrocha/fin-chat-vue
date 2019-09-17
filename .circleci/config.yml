@@ -24,7 +24,7 @@ jobs:
           command: npm test
       - store_test_results:
           path: test-results
-  deploy_to_staging:
+  deploy:
     docker:
       - image: circleci/node:10
     working_directory: ~/repo
@@ -42,7 +42,7 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run:
-          name: Run tests
+          name: Build
           command: npm run build
       - aws-s3/sync:
           from: 'dist'
@@ -53,12 +53,15 @@ jobs:
           overwrite: true
 workflows:
   version: 2
-  ultimate_pipeline:
+  test_pipeline:
     jobs:
       - build_and_test
-      - deploy_to_staging:
+  test_deploy_pipeline:
+    jobs:
+      - build_and_test
+      - deploy:
           requires:
             - build_and_test
-#          filters:
-#            branches:
-#              only: master
+          filters:
+            branches:
+              only: master
