@@ -14,7 +14,7 @@ Vue.config.productionTip = false;
 
 Vue.use(VueChatScroll)
 Vue.prototype.$http = axios;
-axios.defaults.baseURL = process.env.API_URL || "http://localhost:8001";
+axios.defaults.baseURL = process.env.VUE_APP_ROOT_API;
 
 Vue.filter("timestamp", value => {
   return moment(value).format("LLL");
