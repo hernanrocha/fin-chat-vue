@@ -118,8 +118,7 @@ export default {
         }
       }).catch(error => (this.backToHome()))
 
-    // this.ws = new WebSocket('ws://' + window.location.host + '/ws');
-    this.ws = new WebSocket("ws://localhost:8001/ws");
+    this.ws = new WebSocket(process.env.VUE_APP_WS_URL);
     this.ws.addEventListener('message', e => {
         let m = JSON.parse(e.data)
         console.log(m);
