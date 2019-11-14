@@ -9,7 +9,7 @@
     <v-app-bar app color="info" dark>
       
       <!-- Left -->
-      <v-icon color="white">chart-finance</v-icon>  
+      <v-icon color="white" class="mr-2">insert_chart_outlined</v-icon>  
       <v-toolbar-title>FinChat</v-toolbar-title>
 
       <v-spacer></v-spacer>

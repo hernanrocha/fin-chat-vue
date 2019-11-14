@@ -1,5 +1,6 @@
 import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import axios from "axios";
 import moment from "moment";
 import VueChatScroll from "vue-chat-scroll";

@@ -106,6 +106,31 @@ export default {
     backToHome() {
       console.log("Back to home...")
       this.$router.push({ name: 'home' })
+    },
+    createWebsocket() {
+      this.ws = new WebSocket(process.env.VUE_APP_WS_URL);
+      this.ws.addEventListener('message', e => {
+          let m = JSON.parse(e.data)
+          console.log(m);
+          if (m.room_id == this.selectedRoom.id) {
+            this.messages.push(m)
+          }
+      });
+      this.ws.addEventListener('error', e => {
+        console.log('WEBSOCKET ERROR');
+        console.log({e});
+      });
+      this.ws.addEventListener('close', e => {
+        console.log('WEBSOCKET CLOSE');
+        console.log({e});
+        if (true) {
+          this.createWebsocket();
+        }
+      });
+      this.ws.addEventListener('open', e => {
+        console.log('WEBSOCKET OPEN');
+        console.log({e});
+      });
     }
   },
   mounted () {
@@ -117,15 +142,7 @@ export default {
           this.selectRoom(0)
         }
       }).catch(error => (this.backToHome()))
-
-    this.ws = new WebSocket(process.env.VUE_APP_WS_URL);
-    this.ws.addEventListener('message', e => {
-        let m = JSON.parse(e.data)
-        console.log(m);
-        if (m.room_id == this.selectedRoom.id) {
-          this.messages.push(m)
-        }
-    });
+    this.createWebsocket();
   }
 };
 </script>
