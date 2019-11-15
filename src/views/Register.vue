@@ -1,30 +1,63 @@
 <template>
-  <div class="container">
-    <div class="card login">
-      <div class="card-body">
-        <h2 class="card-title text-center">Register</h2>
-        <form @submit.prevent="register" class="text-center">
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Enter Username" name="username" v-model="username">
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Enter Email" name="email" v-model="email">
-          </div>
-          <div class="form-group">
-            <input type="password" class="form-control" placeholder="Enter Password" name="password" v-model="password">
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Enter First Name (optional)" name="first_name" v-model="first_name">
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Enter Last Name (optional)" name="last_name" v-model="last_name">
-          </div>
-          <p v-if="errorText" class="text-danger">{{ errorText }}</p>
-          <button class="btn btn-primary">Register</button>
-        </form>
-      </div>
-    </div>
-  </div>
+  <v-container>
+    <v-row justify="center">
+      <v-col md="6">
+
+        <v-card outlined :loading="loading">
+          <v-card-title><span class="headline">Register</span></v-card-title>
+          <v-card-text>
+            <v-form @submit.prevent="register">
+              <v-container>
+                <v-row>
+                  <v-col>
+                    <v-text-field v-model="email" label="Email" required></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field v-model="username" label="Username" required></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field
+                      v-model="password"
+                      :append-icon="showPassword ? 'visibility' : 'visibility_off'"
+                      :type="showPassword ? 'text' : 'password'"
+                      label="Password"
+                      @click:append="showPassword = !showPassword"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field v-model="first_name" label="First Name (optional)"></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field v-model="last_name" label="Last Name (optional)"></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row v-if="errorText">
+                  <v-col>
+                    <v-alert type="error" tile>{{errorText}}</v-alert>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-btn color="primary" class="mr-4" @click="register">
+                    Register
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -36,7 +69,8 @@ export default {
         email: "",
         first_name: "",
         last_name: "",
-        errorText: null
+        errorText: null,
+        loading: false,
       }
   },
   methods: {
@@ -45,7 +79,8 @@ export default {
         this.errorText = "Username, email and password are required!"
         return
       }
-      this.errorText = ""
+      this.loading = true;
+      this.errorText = "";
 
       var req = { 
           username: this.username, 
@@ -57,9 +92,11 @@ export default {
       this.$http.post("/register", req)
         .then(response => {
           console.log(response.data)
+          this.loading = false;
           this.$router.push({ name: 'home' })
         })
         .catch(err => {
+          this.loading = false;
           this.errorText = "Register failed!"
           console.log(err)
         })
@@ -67,14 +104,3 @@ export default {
   }
 }
 </script>
-
-
-<style scoped>
-.login {
-  max-width: 450px;
-  margin-top: 50px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-</style>

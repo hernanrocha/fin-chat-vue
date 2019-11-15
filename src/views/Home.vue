@@ -1,25 +1,48 @@
 <template>
-  <div class="container">
-    <div class="card login">
-      <div class="card-body">
-        <h2 class="card-title text-center">Login</h2>
-        <form @submit.prevent="login" class="text-left">
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" placeholder="Enter username" name="username" v-model="username">
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" placeholder="Enter password" name="password" v-model="password">
-          </div>
-          <p v-if="errorText" class="text-danger">{{ errorText }}</p>
-          <div class="text-center">
-            <button class="btn btn-primary">Enter Chat</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+  <v-container>
+    <v-row justify="center">
+      <v-col md="6">
+
+        <v-card outlined :loading="loading">
+          <v-card-title><span class="headline">Login</span></v-card-title>
+          <v-card-text>
+            <v-form @submit.prevent="login">
+              <v-container>
+                <v-row>
+                  <v-col>
+                    <v-text-field v-model="username" label="Username" required></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field
+                      v-model="password"
+                      :append-icon="showPassword ? 'visibility' : 'visibility_off'"
+                      :type="showPassword ? 'text' : 'password'"
+                      label="Password"
+                      @click:append="showPassword = !showPassword"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row v-if="errorText">
+                  <v-col>
+                    <v-alert type="error" tile>{{errorText}}</v-alert>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-btn color="primary" class="mr-4" @click="login">
+                    Enter Chat
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -28,7 +51,9 @@ export default {
     return {
       username: "",
       password: "",
-      errorText: null
+      errorText: null,
+      showPassword: false,
+      loading: false,
     }
   },
   methods: {
@@ -37,6 +62,9 @@ export default {
         this.errorText = "Please enter username and password!"
         return
       }
+      
+      this.loading = true;
+      this.errorText = "";
 
       var req = { username: this.username, password: this.password }
       this.$http.post("/login", req)
@@ -45,9 +73,11 @@ export default {
           console.log(this.$http.defaults)
           this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token
           this.$router.push({ name: 'chat' })
+          this.loading = false;
         })
         .catch(err => {
           this.errorText = "Invalid credentials"
+          this.loading = false;
           console.log(err)
         })
     }
