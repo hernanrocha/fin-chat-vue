@@ -25,14 +25,20 @@
     <v-content>
       <router-view/>
     </v-content>
+    
+    <ConnectionManager></ConnectionManager>
+
   </v-app>
 </template>
 
 <script>
+import ConnectionManager from "@/components/ConnectionManager.vue";
 
 export default {
   name: 'App',
-
+  components: {
+    ConnectionManager,
+  },
   data: () => ({
     //
   }),

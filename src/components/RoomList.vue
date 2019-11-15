@@ -55,11 +55,7 @@ export default {
     return {
       rooms: [],
       newRoom: "",
-      selectedRoom: {
-        id: 0,
-        name: "",
-      },
-      messages: [],
+      
       newMessage: "",
       ws: null,
     }
@@ -82,11 +78,12 @@ export default {
         })
     },
     selectRoom(index) {
-      this.selectedRoom = this.rooms[index]
+      this.$store.commit('setSelectedRoom', this.rooms[index]);
+      this.$store.commit('clearMessages');
       this.$http.get("/api/v1/rooms/" + this.selectedRoom.id + "/messages")
         .then(response => 
         {
-          this.messages = response.data.messages.reverse()
+          this.$store.commit('setMessages', response.data.messages.reverse());
         }).catch(error => {
           this.backToHome()
         })
@@ -106,31 +103,6 @@ export default {
     backToHome() {
       console.log("Back to home...")
       this.$router.push({ name: 'home' })
-    },
-    createWebsocket() {
-      this.ws = new WebSocket(process.env.VUE_APP_WS_URL);
-      this.ws.addEventListener('message', e => {
-          let m = JSON.parse(e.data)
-          console.log(m);
-          if (m.room_id == this.selectedRoom.id) {
-            this.messages.push(m)
-          }
-      });
-      this.ws.addEventListener('error', e => {
-        console.log('WEBSOCKET ERROR');
-        console.log({e});
-      });
-      this.ws.addEventListener('close', e => {
-        console.log('WEBSOCKET CLOSE');
-        console.log({e});
-        if (true) {
-          this.createWebsocket();
-        }
-      });
-      this.ws.addEventListener('open', e => {
-        console.log('WEBSOCKET OPEN');
-        console.log({e});
-      });
     }
   },
   mounted () {
@@ -142,7 +114,10 @@ export default {
           this.selectRoom(0)
         }
       }).catch(error => (this.backToHome()))
-    this.createWebsocket();
+  },
+  computed: {
+    messages() { return this.$store.state.messages; },
+    selectedRoom() { return this.$store.state.selectedRoom; },
   }
 };
 </script>
