@@ -20,8 +20,19 @@
             <ul class="list-unstyled">
               <li>Go 1.12.1</li>
               <li>Gin Gonic 1.4.0</li>
-              <li>Postgres 11.3</li>
-              <li>RabbitMQ 3.7</li>
+              <li>Gorm</li>
+              <li>JWT</li>
+              <li>Swagger</li>
+            </ul>
+
+            <p><b>AWS Services:</b></p>
+            <ul class="list-unstyled">
+              <li>ECS</li>
+              <li>SNS</li>
+              <li>SQS</li>
+              <li>RDS</li>
+              <li>Lambda</li>
+              <li>ELB</li>
             </ul>
 
             <p><b>IMPORTANT NOTE:</b> this application contains debug information and should be optimized before deploy to Production</p>
