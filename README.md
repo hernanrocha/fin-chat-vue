@@ -16,7 +16,7 @@ docker-compose up
 
 ## How to Use it
 
-Once you run the container, you could open http://localhost:8080 in your browser.
+Once you run the container, you could open http://localhost:8080 in your browser. It's deployed in AWS CloudFront and can be accessed in http://d248lwd9khygi6.cloudfront.net/
 
 Before enter the chat, you have to create and account and then login with the generated credentials.
 In the chat page, you select a room from the left list or create your own room.
